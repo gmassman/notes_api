@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://unpkg.com/htmx.org@0.0.4"></script>
+	</head>
+</html>
+<body>
+	<form hx-post="/" hx-target="this" hx-swap="outerHTML">
+		<div>
+			<label>Login Token</label>
+			<input type="text" name="login_token" value="">
+		</div>
+		<button class="btn">Submit</button>
+		<button class="btn" hx-get="/">Cancel</button>
+	</form>
+</body>

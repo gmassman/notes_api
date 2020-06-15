@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+</html>
+<body>
+  <ul>
+  <% for {key, val} <- results do %>
+    <li><%= "#{key}: #{val}" %></li>
+  <% end %>
+  </ul>
+</body>

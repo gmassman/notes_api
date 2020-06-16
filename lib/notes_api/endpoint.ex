@@ -6,10 +6,17 @@ defmodule NotesAPI.Endpoint do
 
   use Plug.Router
 
-  plug :match
+  plug NotesAPI.Plugs
   plug Plug.Logger
   plug Plug.Parsers, parsers: [:urlencoded]
-  plug Plug.Session, store: :ets, key: "_notes_api_session", table: :session
+  plug Plug.Session, store: :cookie,
+                     key: "_notes_api_session",
+                     encryption_salt: Application.get_env(:notes_api, :encryption_salt),
+                     signing_salt: Application.get_env(:notes_api, :signing_salt),
+                     key_length: 64,
+                     log: :debug
+  plug :fetch_session
+  plug :match
   plug :dispatch
 
   get "/", do: NotesAPI.Login.view_index(conn)

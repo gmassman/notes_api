@@ -5,8 +5,15 @@
 </html>
 <body>
   <ul>
-  <% for {key, val} <- results do %>
-    <li><%= "#{key}: #{val}" %></li>
+  <%= for {key, val} <- results do %>
+    <li>
+      <%= case key do
+        "edam_expires" ->
+          "#{key}: #{String.to_integer(val) |> DateTime.from_unix!(:millisecond)}"
+        _ ->
+          "#{key}: #{val}"
+      end %>
+    </li>
   <% end %>
   </ul>
 </body>

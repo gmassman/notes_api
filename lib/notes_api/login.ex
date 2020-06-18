@@ -5,13 +5,17 @@ defmodule NotesAPI.Login do
   def view_index(conn, _params \\ []) do
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, "login.eex" |> Util.template_file |> EEx.eval_file)
+    |> send_resp(200, "login.eex"
+                      |> Util.template_file
+                      |> EEx.eval_file)
   end
 
   def handle_index(conn, _params \\ []) do
     case check_login(conn.params) do
       true ->
-        send_resp(conn, 200, "load_oauth.eex" |> Util.template_file |> EEx.eval_file)
+        send_resp(conn, 200, "load_oauth.eex"
+                             |> Util.template_file
+                             |> EEx.eval_file)
       _ ->
         send_resp(conn, 204, "")
     end

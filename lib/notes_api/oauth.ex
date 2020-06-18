@@ -12,7 +12,6 @@ defmodule NotesAPI.OAuth do
   import Plug.Conn
 
   def get_evernote_login(conn) do
-    IO.inspect(@use_en_sandbox, label: "using sandbox?")
     authorization_url = "#{base_oauth_url()}/OAuth.action?oauth_token=#{temp_token(conn.host)}"
 
     conn
@@ -21,20 +20,12 @@ defmodule NotesAPI.OAuth do
   end
 
   def callback(conn) do
-    results = access_token(conn.params["oauth_token"], conn.params["oauth_verifier"])
+    oauth_results = fetch_oauth_results(conn.params["oauth_token"], conn.params["oauth_verifier"])
 
     conn
-    |> put_session(:results, results)
-    |> put_resp_header("Location", Util.results_path(conn.host))
+    |> put_session(:oauth_results, oauth_results)
+    |> put_resp_header("Location", Util.dashboard_path(conn.host))
     |> send_resp(302, "")
-  end
-
-  def results(conn) do
-    conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, "results.eex"
-                      |> Util.template_file
-                      |> EEx.eval_file(results: get_session(conn, :results)))
   end
 
   defp base_oauth_url() do
@@ -71,7 +62,7 @@ defmodule NotesAPI.OAuth do
     |> Map.fetch!("oauth_token")
   end
 
-  defp access_token(token, verifier) do
+  defp fetch_oauth_results(token, verifier) do
     oauth_credentials(token: token)
     |> request_oauth_body([{"oauth_verifier", verifier}])
     |> Enum.into(%{}, fn {k, v} ->

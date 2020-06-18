@@ -1,0 +1,22 @@
+<%= if !is_nil(oauth_results) do %>
+  <!DOCTYPE html>
+  <html>
+    <head>
+    </head>
+  </html>
+  <body>
+    <a href="/logout">Logout</a>
+    <ul>
+    <%= for {key, val} <- oauth_results do %>
+      <li>
+        <%= case key do
+          "edam_expires" ->
+            "#{key}: #{String.to_integer(val) |> DateTime.from_unix!(:millisecond)}"
+          _ ->
+            "#{key}: #{val}"
+        end %>
+      </li>
+    <% end %>
+    </ul>
+  </body>
+<% end %>

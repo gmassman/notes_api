@@ -23,10 +23,11 @@ defmodule NotesAPI.Endpoint do
   post "/", do: NotesAPI.Login.handle_index(conn)
   get "/oauth", do: NotesAPI.OAuth.get_evernote_login(conn)
   get "/oauth_callback", do: NotesAPI.OAuth.callback(conn)
-  get "/results", do: NotesAPI.OAuth.results(conn)
+  get "/dashboard", do: NotesAPI.Dashboard.dashboard(conn)
+  get "/logout", do: NotesAPI.Dashboard.logout(conn)
 
   match _ do
-    send_resp(conn, 404, "oops... Nothing here :(")
+    send_resp(conn, 404, "")
   end 
 end
 

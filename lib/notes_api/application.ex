@@ -10,7 +10,8 @@ defmodule NotesAPI.Application do
         options: [
           port: Application.get_env(:notes_api, :port)
         ]
-      )
+      ),
+      NotesAPI.Poems.PeriodicChecker
     ]
 
     Logger.info("server starting at http://localhost:#{Application.get_env(:notes_api, :port)}")

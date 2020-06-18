@@ -5,11 +5,11 @@ defmodule NotesAPI.Util do
     |> Path.expand(__ENV__.file)
   end
 
-  def results_path(host) do
+  def dashboard_path(host) do
     if Mix.env() == :prod do
-      "https://#{host}/results"
+      "https://#{host}/dashboard"
     else
-      "http://#{host}:#{Application.get_env(:notes_api, :port)}/results"
+      "http://#{host}:#{Application.get_env(:notes_api, :port)}/dashboard"
     end
   end
 end

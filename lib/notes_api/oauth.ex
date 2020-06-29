@@ -12,7 +12,7 @@ defmodule NotesAPI.OAuth do
   import Plug.Conn
 
   def get_evernote_login(conn) do
-    authorization_url = "#{base_oauth_url()}/OAuth.action?oauth_token=#{temp_token(conn.host)}"
+    authorization_url = "#{base_oauth_url()}/OAuth.action?oauth_token=#{temp_token()}"
 
     conn
     |> put_resp_header("Location", authorization_url)
@@ -24,7 +24,7 @@ defmodule NotesAPI.OAuth do
 
     conn
     |> put_session(:oauth_results, oauth_results)
-    |> put_resp_header("Location", Util.dashboard_path(conn.host))
+    |> put_resp_header("Location", "#{Util.hostname()}/dashboard")
     |> send_resp(302, "")
   end
 
@@ -56,9 +56,9 @@ defmodule NotesAPI.OAuth do
     end)
   end
 
-  defp temp_token(host) do
+  defp temp_token() do
     oauth_credentials()
-    |> request_oauth_body([{"oauth_callback", "http://#{host}:#{Application.get_env(:notes_api, :port)}/oauth_callback"}])
+    |> request_oauth_body([{"oauth_callback", "#{Util.hostname()}/oauth_callback"}])
     |> Map.fetch!("oauth_token")
   end
 

@@ -7,7 +7,12 @@ defmodule NotesAPI.MixProject do
       version: "0.1.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: [
+        notes_api: [
+          include_executables_for: [:unix]
+        ]
+      ]
     ]
   end
 
@@ -16,20 +21,17 @@ defmodule NotesAPI.MixProject do
     [
       extra_applications: [:logger, :plug_cowboy, :httpoison],
       mod: {NotesAPI.Application, []}
-      #applications: [:everex]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:everex, path: "/media/parsley/home/garrett/elixir/everex"},
+      {:everex, git: "https://github.com/gmassman/everex.git", tag: "v0.1.2"},
       {:plug_cowboy, "~> 2.0"},
       {:oauther, "~> 1.1"},
       {:httpoison, "~> 1.6"},
       {:git_cli, "~> 0.3"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
   end
 end

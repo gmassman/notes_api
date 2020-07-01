@@ -18,6 +18,5 @@ config :notes_api, en_access_token: System.get_env("EN_ACCESS_TOKEN", "")
 
 # Code Repos
 config :notes_api, infosite_repo: System.get_env("INFOSITE_REPO", "")
-config :notes_api, public_repo: System.get_env("PUBLIC_REPO", "")
 
 config :logger, level: :info

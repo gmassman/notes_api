@@ -7,6 +7,7 @@ defmodule NotesAPI.Poems.Publisher do
   def run(state) do
     Logger.info("current state: #{inspect(state)}")
     {:ok, client} = Everex.Client.new(@en_access_token)
+    :timer.sleep(200)  # wait for the client GenServer to come online...
     poems = client
             |> find_publish_tag()
             |> find_tagged_notes(client)

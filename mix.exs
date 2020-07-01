@@ -31,7 +31,8 @@ defmodule NotesAPI.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:oauther, "~> 1.1"},
       {:httpoison, "~> 1.6"},
-      {:git_cli, "~> 0.3"}
+      {:git_cli, "~> 0.3"},
+      {:erlport, "~> 0.10.1"},
     ]
   end
 end

@@ -1,6 +1,6 @@
 defmodule NotesAPI.Poems.PeriodicChecker do
-  @work_interval 100 * 60 * 60 * 1000
-  #@work_interval 60 * 60 * 1000 # 1 hour
+  #@work_interval 100 * 60 * 60 * 1000
+  @work_interval 60 * 60 * 1000 # 1 hour
 
   use GenServer
 

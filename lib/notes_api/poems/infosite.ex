@@ -1,21 +1,22 @@
 defmodule NotesAPI.Poems.Infosite do
   @infosite_repo Application.get_env(:notes_api, :infosite_repo)
 
-  alias NotesAPI.Poems.PythonHelper
   require Logger
-  require IEx
+
   def publish(poem) do
-    
     repo = infosite_repo()
     repo |> Git.pull!(~w(--rebase origin master))
+    repo |> Git.submodule!(~w(update --init))  # in case clone failed
 
     Logger.info("successfully cloned infosite")
 
     File.cd!("infosite", fn ->
-      generate_poem(poem.title, poem.content)
+      generate_poem!(poem.title, poem.content)
+      build_and_deploy!()
+      push_to_origin!(repo, poem.title)
     end)
 
-    nil
+    :ok
   end
 
   defp infosite_repo() do
@@ -27,27 +28,30 @@ defmodule NotesAPI.Poems.Infosite do
     end
   end
 
-  def generate_poem(title, content) do
-    {res0, code0} = File.cwd!
-                    |> Path.join("scripts/bootstrap_python.sh")
-                    |> System.cmd([])
-    Logger.info("Installed python deps: status #{code0}")
+  defp generate_poem!(title, content) do
+    tempfile = System.tmp_dir!() |> Path.join("note.enml")
+    File.write!(tempfile, content)
 
-    {res1, code1} = System.cmd("poetry", ["shell"])
-    Logger.info("Activate python 3.7: status #{code1}")
+    {res, code} = File.cwd!
+                  |> Path.join("bin/enml_to_mdx_poem")
+                  |> System.cmd([tempfile], stderr_to_stdout: true)
 
-    {res2, code2} = File.cwd!
-                    |> Path.join("scripts/enml_to_mdx_poem.py")
-                    |> System.cmd([])
-    Logger.info("Ran ENML -> MDX script: status #{code2}")
+    if code != 0 do
+      raise "failed to generate markdown poem: $? = #{code}\n#{res}"
+    end
 
-    #content = format_poem(title, content)
-    IEx.pry
-    res2
+    File.rm!(tempfile)
+
+    File.cwd!
+    |> Path.join("src/content/poetry/#{next_poetry_filename(title)}")
+    |> File.write!(poem_header(title) <> "\n" <> res)
+
+    Logger.info("Generated poem file \"#{title}\"")
   end
 
-  def next_poetry_filename(title) do
-    prev_max = "infosite/content/poetry"
+  defp next_poetry_filename(title) do
+    prev_max = File.cwd!
+               |> Path.join("src/content/poetry")
                |> File.ls!
                |> Enum.map(fn file ->
                  String.split(file, "-")
@@ -62,20 +66,33 @@ defmodule NotesAPI.Poems.Infosite do
     "#{prev_max+1}-#{formatted_title}.md"
   end
 
-  #def format_poem(title, enml_content) do
-    #pypid = PythonHelper.pypid('scripts')
+  defp poem_header(title) do
+    """
+    ---
+    title: "#{title}"
+    date: #{Date.to_string(Date.utc_today)}
+    description: "generated using NotesAPI"
+    type: "poetry"
+    ---
+    """
+  end
 
-    #md_content = pypid
-                 #|> PythonHelper.call(:enml_to_mdx_poem, :generate_markdown, [enml_content])
-                 #|> to_string()
+  defp build_and_deploy!() do
+    {_res, code} = File.cwd!
+                   |> Path.join("bin/deploy")
+                   |> System.cmd([], stderr_to_stdout: true, into: IO.stream(:stdio, :line))
+    if code != 0 do
+      raise "failed to build and deploy: $? = #{code}"
+    end
 
-    #IEx.pry
-    #PythonHelper.stop(pypid)
-    #md_content
-  #end
-  #defp generate_poem(title, enml_content) do
-    # run infosite/scripts/enml_to_mdx_poem.py <(echo #{enml_content}) > poem_content
-    # also decide on whether python or elixir fills in the content/poetry/template.md file
-    # Also make sure to use correct N prefix for poem, and correct title
-  #end
+    Logger.info("built and deployed site")
+  end
+
+  defp push_to_origin!(repo, title) do
+    repo |> Git.add!(".")
+    repo |> Git.commit!(["-m", "published poetry: #{title}"])
+    repo |> Git.push!()
+
+    Logger.info("pushed new content to repo")
+  end
 end

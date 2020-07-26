@@ -27,12 +27,11 @@ defmodule NotesAPI.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:everex, git: "https://github.com/gmassman/everex.git", tag: "v0.1.2"},
+      {:everex, git: "https://github.com/gmassman/everex.git", tag: "v0.2.0"},
       {:plug_cowboy, "~> 2.0"},
       {:oauther, "~> 1.1"},
       {:httpoison, "~> 1.6"},
       {:git_cli, "~> 0.3"},
-      {:erlport, "~> 0.10.1"},
     ]
   end
 end

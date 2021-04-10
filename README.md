@@ -1,6 +1,10 @@
 # NotesAPI
 
-**TODO: Add description**
+Download the latest code on the server, then from the app directory run these commands:
+```
+MIX_ENV=prod mix release --path ~/notes_api_release
+cd ~/notes_api_release && bin/notes_api start_iex
+```
 
 ## Installation
 
